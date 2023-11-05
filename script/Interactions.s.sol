@@ -9,9 +9,9 @@ import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 
 contract CreateSubscription is Script {
 
-    function createSubscription(address vrfCoordinator) public returns(uint64){
+    function createSubscription(address vrfCoordinator ,uint256 deployerKey) public returns(uint64){
         console.log("creating subscription on chainId" , block.chainid);
-        vm.startBroadcast();
+        vm.startBroadcast(deployerKey);
         uint64 subId = VRFCoordinatorV2Mock(vrfCoordinator).createSubscription();
         vm.stopBroadcast();
         console.log("your subId is" ,subId );
@@ -21,8 +21,8 @@ contract CreateSubscription is Script {
     
     function createSubscriptionUsingConfig() public returns (uint64) {
         HelperConfig helperConfig = new HelperConfig();
-        (, , address vrfCoordinator, , , , ) = helperConfig.activeNetworkConfig();
-        return createSubscription(vrfCoordinator);
+        (, , address vrfCoordinator, , , , ,uint256 deployerKey) = helperConfig.activeNetworkConfig();
+        return createSubscription(vrfCoordinator ,deployerKey);
     }
 
     function run() public {
@@ -47,7 +47,7 @@ contract FundSubscription is Script{
 
     function fundSubscriptionUsingConfig() public {
         HelperConfig helperConfig = new HelperConfig();
-        (, , address vrfCoordinator, ,uint64 subId ,,address link ) = helperConfig.activeNetworkConfig();
+        (, , address vrfCoordinator, ,uint64 subId ,,address link ,) = helperConfig.activeNetworkConfig();
         fundSubscription(subId , vrfCoordinator , link);
     }
     
@@ -57,8 +57,8 @@ contract FundSubscription is Script{
 }
 
 contract AddConsumer is Script {
-    function addConsumer(address vrfCoordinator , address contractToAddToVrf , uint64 subId) public {
-        vm.startBroadcast();
+    function addConsumer(address vrfCoordinator , address contractToAddToVrf , uint64 subId ,uint256 deployerKey) public {
+        vm.startBroadcast(deployerKey);
         VRFCoordinatorV2Mock(vrfCoordinator).addConsumer(
             subId,
             contractToAddToVrf
@@ -68,8 +68,8 @@ contract AddConsumer is Script {
 
     function addConsumerUsingConfig(address mostRecentlyDeployed) public {
         HelperConfig helperConfig = new HelperConfig();
-        (, , address vrfCoordinator, ,uint64 subId ,, ) = helperConfig.activeNetworkConfig();
-        addConsumer(vrfCoordinator, mostRecentlyDeployed, subId);
+        (, , address vrfCoordinator, ,uint64 subId ,, ,uint256 deployerKey) = helperConfig.activeNetworkConfig();
+        addConsumer(vrfCoordinator, mostRecentlyDeployed, subId ,deployerKey);
 
     }
     

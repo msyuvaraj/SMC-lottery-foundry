@@ -55,6 +55,7 @@ contract Raffle is VRFConsumerBaseV2 {
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
 
+   
 
     uint256 private immutable i_entranceFee;
     uint256 private immutable i_interval; // @dev duration of the lottery in seconds
@@ -109,7 +110,7 @@ contract Raffle is VRFConsumerBaseV2 {
       emit EnteredRaffle(msg.sender);
     }
 
-    function checkUpKeep(bytes memory /*checkData */) public view returns(bool upKeepNeeded,bytes memory /* performData */) {
+    function checkUpkeep(bytes memory /*checkData */) public view returns(bool upKeepNeeded,bytes memory /* performData */) {
        bool timeHasPassed = (block.timestamp - s_lastTimeStamp) >= i_interval;
        bool isOpen = RaffleState.OPEN == s_raffleState;
        bool hasBalance = address(this).balance > 0;
@@ -120,7 +121,7 @@ contract Raffle is VRFConsumerBaseV2 {
 
 
     function performUpkeep(bytes calldata /* performData */) external {
-        (bool upKeepNeeded ,) = checkUpKeep("");
+        (bool upKeepNeeded ,) = checkUpkeep("");
         if(!upKeepNeeded){
             revert Raffle__UpKeepNotNeeded(
                 address(this).balance,
@@ -174,5 +175,17 @@ contract Raffle is VRFConsumerBaseV2 {
 
     function getPlayers(uint256 indexOfPlayer) external view returns(address){
         return s_players[indexOfPlayer];
+    }
+
+    function getRecentWinner() external view returns(address){
+        return s_recentWinner;
+    }
+
+    function getLengthOfPlayers() external view returns(uint256){
+        return s_players.length;
+    }
+
+    function getTimeStamp() external view returns(uint256){
+        return s_lastTimeStamp;
     }
 }
